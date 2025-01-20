@@ -16,4 +16,15 @@ def millerRabin(n:int , k:int):
         # Enquanto a divisão inteira por 2 de n-1 resultar em um valor par...
         nMenos1 = nMenos1 >> 1
         expoente+=1
-    # Dados nMenos1 e o expoente: n-1
+    m = nMenos1
+    e = expoente
+    # Dados "m" e o "e": n-1 pode ser escrito como (2^e)*m
+    # Sorteando a tq 1<a<n-1
+    for i in range(k):
+        a = random.randint(2, n-2)
+        if not testeDeMiller(a, n):
+            return False
+    return True
+def testeDeMiller(a, n):
+    # Se a e n são coprimos -> vale o teorema de fermat, logo a^(fi(n)) é congruente a 1 módulo n 
+    return True if (((a**(n-1) % n) == 1) or ((a**(n-1) % n) == -1)) else False
