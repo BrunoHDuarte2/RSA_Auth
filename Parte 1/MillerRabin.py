@@ -22,9 +22,15 @@ def millerRabin(n:int , k:int):
     # Sorteando a tq 1<a<n-1
     for i in range(k):
         a = random.randint(2, n-2)
-        if not testeDeMiller(a, n):
+        if not testeDeMiller(a, n, e, m):
             return False
     return True
-def testeDeMiller(a, n):
-    # Se a e n são coprimos -> vale o teorema de fermat, logo a^(fi(n)) é congruente a 1 módulo n 
-    return True if (((a**(n-1) % n) == 1) or ((a**(n-1) % n) == -1)) else False
+def testeDeMiller(base, numero, expoente, m):
+    x = pow(base, m, numero)
+    if x == 1 or x == numero-1:
+        return True
+    for i in range(expoente-1):
+        x = pow(x, 2, numero)
+        if x == numero-1:
+            return True
+    return False
