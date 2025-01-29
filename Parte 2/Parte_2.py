@@ -14,7 +14,7 @@ def ass_msg (m, d, n):
     m_hash = g_hash(m) # Gerando o hash da mensagem H(M)
     m_int = int(m_hash, 16) # transformando hexdecimal em inteiro
     m_ass = pow(m_int, d, n) # gerando a assinatura (M^d mod n)
-    return m_ass
+    return m_ass, m #retorna a mensagem em claro + a mensagem criptografada E(PRa,H(M))
 
 # Formatação da mensagem
 def formatacao_base64(m_ass):
@@ -27,5 +27,4 @@ d = 123456789
 n = 987654321
 m = "GeeksForGeeks"
 
-print(ass_msg(m, d, n))
-print(formatacao_base64(ass_msg(m, d, n)))
+#print(ass_msg(m, d, n))
