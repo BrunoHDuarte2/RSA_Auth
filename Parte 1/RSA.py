@@ -5,7 +5,7 @@ import sympy
 import hashlib
 import os
 class RSA:
-    def __init__(self):
+    def _init_(self):
         self.public, self.private = self.geraChaves()
     def geraChaves(self):
         # Para gerar chaves RSA primeiro se escolhe randomicamente p e q
@@ -26,26 +26,40 @@ class RSA:
         d = sympy.mod_inverse(e, phi_n)
         # Retorna a chave pública e a chave privada.
         return (n, e), (n, d)
-    def OAEPEncode(self, message):
-        (n, _) = self.public
-        hashSHA256 = hashlib.sha256
-        tamanhoHash = hashSHA256().digest_size # Aqui pode ser substituido diretamente por 32, dado que 256 bits / 8 = 32
-        tamanhoMessage = (n.bit_length() + 7) // 8 # # Tamanho que uma mensagem ocupa em bytes
-        # Se o tamanho da mensagem for maior que o espaço disponível - os dois hashs necessários no OAEP (Mascara da mensagem e Mascara do valor aleatório) - o byte de serapação (\x01)
-        if len(message) > tamanhoMessage - 2*tamanhoHash-2:
-            return None
-        maskAleatoria = random.getrandbits(tamanhoHash*8) # Aqui dá pra substituir por 256 pelo mesmo motivo de cima
-        # Pega a mensagem, tranforma em bytes, hasheia e pega o valor de hash
-        messageHash = hashSHA256(message.encode()).digest()
-        hashMaskAleatoria = hashSHA256(maskAleatoria.to_bytes(tamanhoHash,byteorder='big')).digest()
-        # tuplaDeBytes agora contém tuplas (messageHash[i], hashMaskAleatoria[i]) 
-        tuplaDeBytes = zip(messageHash, hashMaskAleatoria)
-        # Usando list comprehension para fazer (messageHash[i] XOR hashMaskAleatoria[i])
-        messageMask = bytes([mhash ^ ahash for (mhash, ahash) in tuplaDeBytes])
-        # Resultado Final:
-        # (hash do valor aleatório XOR hash da mensagem) ++ mensagem original ++ padding
-        messageCodificada = messageMask + message.encode() + bytes([0] * (tamanhoMessage - len(message) - len(messageMask) - 1))
-        return messageCodificada
+    """
+        Entrada:
+            Mensagem a ser criptografada
+            Chave pública
+            Funções de Hash
+        Saída:
+            Mensagem Codificada em OAEP
+    """
+    def OAEPEncode(self, message:str):
+        sha1=hashlib.sha1
+        # Preencher a mensagem com zeros
+        messageEmBytes = message.encode(encoding='utf-8')
+        tamanhoModulo, _ = self.public
+        tamanhoDoModuloEmBits = tamanhoModulo.bit_length() // 8
+        # Padding da mensagem incluí: 0x00 na primeira posição, 0x01 na segunda posição
+        padding = b"\x00\x01"
+        tamanhoDoPadding = tamanhoDoModuloEmBits-len(padding)-len(message)
+        if tamanhoDoPadding < 0:
+            print("Tamanho excedente!")
+            return
+        padding += os.urandom(tamanhoDoPadding) # Aleatoriedade pro padding 
+        dados = padding+messageEmBytes # Concatenação do padding e a mensagem em claro
+        # Geração do vetor de salto ou seed
+        tamanhoDoHash = 20 # Utilizando SHA-1
+        seedAleatoria = os.urandom(20)
+        dadosHash = sha1(dados).digest()
+        seedHash = sha1(seedAleatoria).digest()
+        # 1° Aplicação do XOR: Dados x HashSeed
+        dadosXORhashSeed = [a^b for a, b in zip(dados, seedHash)]
+        # 2° Aplicação do XOR: seed x DadosHash
+        dadosXORhashDados = [a^b for a, b in zip(seedAleatoria, dadosHash)]
+        return bytes(dadosXORhashSeed+ dadosXORhashDados)
+
+
     def RSACriptografa(self, plaintext:str):
         (n, e) = self.public
         messageCodificada = self.OAEPEncode(plaintext)
@@ -60,8 +74,21 @@ class RSA:
         chipertextEmInteiros = int.from_bytes(ciphertext, byteorder='big')
         plaintextCodificadoOAEP = pow(chipertextEmInteiros, d, n) # plaintext = ciphertextEmInteiros^d (mod n)
         plaintextCodificadoOAEPBytes = plaintextCodificadoOAEP.to_bytes((plaintextCodificadoOAEP.bit_length()+7)//8, byteorder='big')
+        print(plaintextCodificadoOAEPBytes)
         return self.OAEPDecode(plaintextCodificadoOAEPBytes)
 
-    def OAEPDecode(self, ciphertext):
+    """
+        Entrada:
+            Mensagem que acabou de passar por descriptografia RSA.
+            As funções de hash.
+            Chave pública do RSA.
+    """
+    def OAEPDecode(self,):
         pass
+
         
+        
+
+
+rsa = RSA()    
+print(rsa.OAEPEncode("Bruno"))
