@@ -38,8 +38,7 @@ assinatura, mensagem = ass_msg(m, d, n)
 m_ass_base64 =  formatacao_base64(assinatura)
 print(f'Mensagem em Claro: {mensagem} \nAssinatura: {assinatura}')
 print(f'Formato base64: {m_ass_base64}')
-if verificacao(e,n,m_ass_base64,m) == True:
-    print('Assinatura validada!')
+if verificacao(e,n,m_ass_base64,m) == True: print('Assinatura validada!')
 else: print('Assinatura inválida')
 
 
