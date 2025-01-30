@@ -146,7 +146,7 @@ class RSA:
         chipertextEmInteiros = int.from_bytes(ciphertext, byteorder='big')
         plaintextCodificadoOAEP = pow(chipertextEmInteiros, d, n) # plaintext = ciphertextEmInteiros^d (mod n)
         plaintextCodificadoOAEPBytes = plaintextCodificadoOAEP.to_bytes((plaintextCodificadoOAEP.bit_length()+7)//8, byteorder='big')
-        print(plaintextCodificadoOAEPBytes)
+      
         return self.OAEPDecode(plaintextCodificadoOAEPBytes)
 
     """
@@ -159,14 +159,4 @@ class RSA:
         pass
 
         
-        
-
-
-rsa = RSA()    
-n, e =rsa.getPublicKey()
-print("Módulo: ", (n.bit_length()))
-print("e: ", (e.bit_length()))
-n, e, d =rsa.getPrivateKey()
-print("Módulo: ", (n.bit_length()))
-print("e: ", (e.bit_length()))
-print("d: ", (d.bit_length()))
+    
