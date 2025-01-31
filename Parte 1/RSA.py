@@ -52,7 +52,7 @@ class RSA:
             file.write(self.toPem(Pr, "-----BEGIN RSA PRIVATE KEY-----", "-----END RSA PRIVATE KEY-----"))
         with open('./Parte 1/keys/publicKey.pem', 'w') as file:
             file.write(self.toPem(Pb, "-----BEGIN RSA PUBLIC KEY-----", "-----END RSA PUBLIC KEY-----"))
-    @staticmethod
+    
     def getPublicKey(self):
         with open('./Parte 1/keys/publicKey.pem', 'r') as file:
             leitura = file.readlines()
@@ -64,7 +64,7 @@ class RSA:
         n, offset = self.decode(publicDataDecoded, offset)  
         e, offset = self.decode(publicDataDecoded, offset)  
         return n, e
-    @staticmethod
+    
     def getPrivateKey(self):
         with open('./Parte 1/keys/privateKey.pem', 'r') as file:
             leitura = file.readlines()
@@ -99,39 +99,36 @@ class RSA:
         # Retorna a chave pública e a chave privada.
         return (n, e), (n, d)
     """
-        Entrada:
-            Mensagem a ser criptografada
-            Chave pública
-            Funções de Hash
-        Saída:
-            Mensagem Codificada em OAEP
+        Seguindo o algoritmo descrito no paper do Yutong Zhong
+        Parametros e operações necessárias:
+            n: tamanho em bits do modulo RSA
+            k0 e k1: numeros definidos pelo protocolo OAEP
+            m: plaintext com tamanho n - k0 - k1 bits
+            G e H: funções criptograficas de hash
+            XOR
+            r: string randomica gerada de k0 bits
     """
-    def OAEPEncode(self, message:str):
-        sha1=hashlib.sha1
-        # Preencher a mensagem com zeros
-        messageEmBytes = message.encode(encoding='utf-8')
-        tamanhoModulo, _ = self.public
-        tamanhoDoModuloEmBits = tamanhoModulo.bit_length() // 8
-        # Padding da mensagem incluí: 0x00 na primeira posição, 0x01 na segunda posição
-        padding = b"\x00\x01"
-        tamanhoDoPadding = tamanhoDoModuloEmBits-len(padding)-len(message)
-        if tamanhoDoPadding < 0:
-            print("Tamanho excedente!")
-            return
-        padding += os.urandom(tamanhoDoPadding) # Aleatoriedade pro padding 
-        dados = padding+messageEmBytes # Concatenação do padding e a mensagem em claro
-        # Geração do vetor de salto ou seed
-        tamanhoDoHash = 20 # Utilizando SHA-1
-        seedAleatoria = os.urandom(20)
-        dadosHash = sha1(dados).digest()
-        seedHash = sha1(seedAleatoria).digest()
-        # 1° Aplicação do XOR: Dados x HashSeed
-        dadosXORhashSeed = [a^b for a, b in zip(dados, seedHash)]
-        # 2° Aplicação do XOR: seed x DadosHash
-        dadosXORhashDados = [a^b for a, b in zip(seedAleatoria, dadosHash)]
-        return bytes(dadosXORhashSeed+ dadosXORhashDados)
-
-
+    def OAEPEncode(self, message: str):
+        m = message.encode('utf-8')
+        n, _ = self.public
+        n = (n.bit_length()+7) // 8  # Tamanho de n em bytes
+        k0 = 256 // 8  # Tamanho do hash em bytes
+        
+        padding_length = n - k0 - len(m)
+        m_padded = m + b'\x00' * padding_length  
+        
+        r = os.urandom(k0)  
+        G = hashlib.sha256
+        H = hashlib.sha256
+        G_r = G(r).digest()
+        X = bytes([a^b for a, b in zip(m_padded, G_r)])
+        
+        H_X = H(X).digest()
+        
+        Y = bytes([a^b for a, b in zip(r, H_X)])
+        
+        return X + Y
+    
     def RSACriptografa(self, plaintext:str):
         (n, e) = self.public
         messageCodificada = self.OAEPEncode(plaintext)
@@ -141,12 +138,11 @@ class RSA:
         mensagemEmInteiros = int.from_bytes(messageCodificada, byteorder='big')
         ciphertext = pow(mensagemEmInteiros, e, n) # ciphertext = mensagemEmInteiros^e (mod n)
         return ciphertext.to_bytes((ciphertext.bit_length()+7)//8, byteorder='big') 
-    def RSADescriptografa(self, ciphertext:str):
+    def RSADescriptografa(self, ciphertext):
         (n, d) = self.private
         chipertextEmInteiros = int.from_bytes(ciphertext, byteorder='big')
         plaintextCodificadoOAEP = pow(chipertextEmInteiros, d, n) # plaintext = ciphertextEmInteiros^d (mod n)
         plaintextCodificadoOAEPBytes = plaintextCodificadoOAEP.to_bytes((plaintextCodificadoOAEP.bit_length()+7)//8, byteorder='big')
-      
         return self.OAEPDecode(plaintextCodificadoOAEPBytes)
 
     """
@@ -155,8 +151,23 @@ class RSA:
             As funções de hash.
             Chave pública do RSA.
     """
-    def OAEPDecode(self,):
-        pass
-
+    def OAEPDecode(self, encoded_message: bytes):
+        n, _ = self.public
+        n = (n.bit_length()+7) // 8  # Tamanho de n em bytes
+        k0 = 256 // 8  # Tamanho do hash em bytes
         
-    
+        
+        X = encoded_message[:32]
+        Y = encoded_message[32:]
+        
+        G = hashlib.sha256
+        H = hashlib.sha256
+        H_X = H(X).digest()
+        r = bytes([a^b for a,b in zip(Y, H_X)])
+        G_r = G(r).digest()
+        
+        m_padded = bytes([a^b for a,b in zip(X, G_r)])
+        message = m_padded.rstrip(b'\x00')
+        return message.decode('utf-8')
+rsa = RSA()
+print(rsa.RSADescriptografa(rsa.RSACriptografa("TESTE DE FUNCIONALIDADEAAAA")))
