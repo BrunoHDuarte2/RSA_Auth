@@ -18,10 +18,23 @@ A classe `RSA` implementa um sistema completo de criptografia RSA com as seguint
 
 ### Inicialização
 ```python
- def __init__(self):
-     self.public, self.private = self.geraChaves()
+def __init__(self):
+        # Tenta ler o arquivo, caso não dê certo gera uma exceção
+        try:
+            # Se a tentativa de leitura de qualquer um dos dois der errado, isso irá gerar um exceção
+            with open('./Parte_1/keys/privateKey.pem', 'r') as file:
+                PrK = file.readlines()
+            with open('./Parte_1/keys/publicKey.pem', 'r') as file:
+                PbK = file.readlines()
+            self.public = self.getPublicKey()
+            n, e, d = self.getPrivateKey()
+            self.private = (n, d)
+        except:
+            # Caso onde o arquivo não existe
+            # O gerachave cria o arquivo se precisar
+            self.public, self.private = self.geraChaves()
 ```
-Gera um par de chaves RSA ao inicializar uma instância da classe.
+
 
 ### Geração de Chaves
 ```python
