@@ -10,7 +10,6 @@ Como representado na figura a seguir:
 
 1. **M (Mensagem Original):**
     - No código, a mensagem original é passada como argumento para as funções `gerar_hash`, `assinar_msg` e `verificar_ass`.
-    - Exemplo: `mensagem` em `gerar_hash(mensagem)`.
 
 2. **H(M) (Hash da Mensagem):**
     - No código, o hash da mensagem é gerado na função `gerar_hash`.
@@ -34,13 +33,13 @@ Como representado na figura a seguir:
 
 4. **E(PRa*Ra*, H(M)) (Assinatura Digital):**
     - No código, a assinatura digital é gerada ao criptografar o hash da mensagem com a chave privada.
-    - Exemplo: `assinatura_msg = self.rsa.RSACriptografa(hash_mensagem)`.
+    -  `assinatura_msg = self.rsa.RSACriptografa(hash_mensagem)`
     - A assinatura é então codificada em Base64 para facilitar o armazenamento e transmissão: `assinatura_msg_base64 = base64.b64encode(assinatura_msg)`.
     - **Matematicamente**, a assinatura é o resultado da operação de criptografia com a chave privada, como descrito acima.
 
 5. **PU_a (Chave Pública para Verificar a Assinatura):**
     - No código, a chave pública é usada na função `RSADescriptografa` para descriptografar a assinatura e recuperar o hash original.
-    - Exemplo: `hash_recuperado = self.rsa.RSADescriptografa(assinaturaEmBytes)`.
+    - `hash_recuperado = self.rsa.RSADescriptografa(assinaturaEmBytes)`
     - **Matematicamente**, a descriptografia com a chave pública no RSA é feita usando a fórmula:
 
         ```math
