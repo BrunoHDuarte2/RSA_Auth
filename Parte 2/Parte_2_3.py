@@ -1,44 +1,29 @@
-import hashlib 
+import hashlib
 import base64
 
- #Transformando a mensagem em bytes e gerando o hash
-def g_hash (mensagem):
-    mensagem_bytes = mensagem.encode(encoding="utf-8") # transformando em bytes
-    gh = hashlib.sha3_256() # criando o objeto hash lib
-    gh.update(mensagem_bytes) # recebndo a entrada
-    m_hash = gh.hexdigest() # gerando o hash da mensagem no formato hexdecimal
-    return m_hash
-
-# Assinatura da mensagem
-def ass_msg (m, d, n):
-    m_hash = g_hash(m) # Gerando o hash da mensagem H(M)
-    m_int = int(m_hash, 16) # transformando hexdecimal em inteiro
-    m_ass = pow(m_int, d, n) # gerando a assinatura (M^d mod n)
-    return m_ass, m #retorna a mensagem em claro + a mensagem criptografada E(PRa,H(M))
-
-# Formatação da mensagem
-def formatacao_base64(m_ass):
-    m_ass_bytes = m_ass.to_bytes((m_ass.bit_length() + 7) // 8, byteorder='big') # int p bytes 
-    m_ass_base64 = base64.b64encode(m_ass_bytes) # bytes p base64
-    print(f'Formatação base64: {m_ass_base64.decode("utf-8")}')
-    return m_ass_base64.decode("utf-8")
-
-
-
-def verificacao(e, n, m_ass_base64, m):
-    hash_mensagem = int(g_hash(m), 16) #gerando o hash da mensagem em claro e transformando em inteiro
-    assinatura_bytes = base64.b64decode(m_ass_base64) # transformanto a str base64 em bytes de novo
-    assinatura_int = int.from_bytes(assinatura_bytes, byteorder='big')
-    hash_recuperado = pow(assinatura_int, e, n)
-    if hash_recuperado == hash_mensagem: return True
-    else: return False
+# Função para gerar o hash (SHA-3-256) de uma mensagem ou arquivo
+def g_hash(mensagem):
+    if isinstance(mensagem, str) and mensagem.endswith('.txt'):  # 
+        with open(mensagem, 'rb') as f:  # 
+            mensagem = f.read()  # 
+    elif isinstance(mensagem, str):
+        mensagem = mensagem.encode(encoding="utf-8")  #
     
+    gh = hashlib.sha3_256()
+    gh.update(m)
+    hash_mensagem = gh.hexdigest()  
+    return hash_mensagem
 
-assinatura, mensagem = ass_msg(m, d, n)
-m_ass_base64 =  formatacao_base64(assinatura)
-print(f'Mensagem em Claro: {mensagem} \nAssinatura: {assinatura}')
-print(f'Formato base64: {m_ass_base64}')
-if verificacao(e,n,m_ass_base64,m) == True: print('Assinatura validada!')
-else: print('Assinatura inválida')
+# Função para assinar a mensagem ou arquivo (usando RSA)
+def assinar_msg(mensagem, d, n):
+    hash_mensagem = g_hash(mensagem)  # Gerando o hash da mensagem ou conteúdo do arquivo H(M)
+    int_msg = int(hash_mensagem, 16)  # Convertendo o hash hexadecimal em inteiro
+    assinatura_msg = pow(int_msg, d, n)  # Gerando a assinatura (M^d mod n)
+    return assinatura_msg, mensagem  # Retorna a assinatura(int) e a mensagem original
 
+def formatar_base64(assinatura_msg):
+    num_bytes = (assinatura_msg.bit_length() + 7) // 8  # Tamanho do módulo n em bytes
+    assinatura_bytes = assinatura_msg.to_bytes(num_bytes, byteorder='big')  # int para bytes com o tamanho correto
+    assinatura_base64 = base64.b64encode(assinatura_bytes)
+    return assinatura_base64
 
