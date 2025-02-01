@@ -15,7 +15,8 @@ class RSA:
             with open('./Parte_1/keys/publicKey.pem', 'r') as file:
                 PbK = file.readlines()
             self.public = self.getPublicKey()
-            self.private = self.getPrivateKey()
+            n, e, d = self.getPrivateKey()
+            self.private = (n, d)
         except:
             # Caso onde o arquivo não existe
             # O gerachave cria o arquivo se precisar

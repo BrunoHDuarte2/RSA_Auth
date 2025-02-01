@@ -30,4 +30,4 @@ class Hash:
         if hash_msg == hash_recuperado:
             print('Assinatura válida!')
         else :
-            print("INVÁLIDA")
+            print("Assinatura inválida!")
