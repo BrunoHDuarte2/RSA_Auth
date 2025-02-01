@@ -55,7 +55,7 @@ Como representado na figura a seguir:
 6. **D (Verificação da Assinatura):**
     - No código, a verificação da assinatura é feita na função `verificar_ass`.
     - O hash da mensagem recebida é comparado com o hash recuperado da assinatura descriptografada.
-    - Exemplo: `if hash_msg == hash_recuperado: print('Assinatura válida!')`.
+    - `if hash_msg == hash_recuperado: print('Assinatura válida!')`.
     - **Matematicamente**, a verificação é bem-sucedida se:
 
         ```math
