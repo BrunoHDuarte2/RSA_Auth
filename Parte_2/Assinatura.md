@@ -4,7 +4,7 @@ A assinatura digital RSA é um método criptográfico que utiliza o algoritmo RS
 
 Como representado na figura a seguir:
 
-![Assinatura Digital RSA](caminho/para/imagem.png)
+![Assinatura Digital RSA]("C:\Users\manuf\Pictures\Screenshots\Captura de tela 2025-02-01 173404.png")
 
 ## Etapas da Implementação
 
@@ -23,7 +23,7 @@ Como representado na figura a seguir:
     - **Matematicamente**, a criptografia com a chave privada no RSA é feita usando a fórmula:
 
         ```math
-        \text{assinatura} = H(M)^d \mod n
+        assinatura: S = H(M)^d \mod n
         ```
 
         Onde:
