@@ -1,5 +1,5 @@
 import random
-from MillerRabin import millerRabin
+from Parte_1.MillerRabin import millerRabin
 def geracaoDePrimos(bits):
     while True:
         num = random.getrandbits(bits) # Gera um número de 1024 bits

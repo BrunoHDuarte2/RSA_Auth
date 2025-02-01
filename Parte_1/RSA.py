@@ -1,4 +1,4 @@
-from GeradorDePrimos import geracaoDePrimos
+from Parte_1.GeradorDePrimos import geracaoDePrimos
 import random
 import math
 import sympy
@@ -7,7 +7,19 @@ import base64
 import os
 class RSA:
     def __init__(self):
-        self.public, self.private = self.geraChaves()
+        # Tenta ler o arquivo, caso não dê certo gera uma exceção
+        try:
+            # Se a tentativa de leitura de qualquer um dos dois der errado, isso irá gerar um exceção
+            with open('./Parte_1/keys/privateKey.pem', 'r') as file:
+                PrK = file.readlines()
+            with open('./Parte_1/keys/publicKey.pem', 'r') as file:
+                PbK = file.readlines()
+            self.public = self.getPublicKey()
+            self.private = self.getPrivateKey()
+        except:
+            # Caso onde o arquivo não existe
+            # O gerachave cria o arquivo se precisar
+            self.public, self.private = self.geraChaves()
         """
             Formato padrão do OpenSSL em base64.
                 -----BEGIN RSA PRIVATE KEY-----
@@ -48,13 +60,13 @@ class RSA:
         Pr = b'\x30' + self.encodeLength(len(der)) + der
         der = b'\x02\x01\x00' + self.encode(moduloN) + self.encode(expoentePublico) 
         Pb = b'\x30' + self.encodeLength(len(der)) + der
-        with open('./Parte 1/keys/privateKey.pem', 'w') as file:
+        with open('./Parte_1/keys/privateKey.pem', 'w') as file:
             file.write(self.toPem(Pr, "-----BEGIN RSA PRIVATE KEY-----", "-----END RSA PRIVATE KEY-----"))
-        with open('./Parte 1/keys/publicKey.pem', 'w') as file:
+        with open('./Parte_1/keys/publicKey.pem', 'w') as file:
             file.write(self.toPem(Pb, "-----BEGIN RSA PUBLIC KEY-----", "-----END RSA PUBLIC KEY-----"))
     
     def getPublicKey(self):
-        with open('./Parte 1/keys/publicKey.pem', 'r') as file:
+        with open('./Parte_1/keys/publicKey.pem', 'r') as file:
             leitura = file.readlines()
         leitura = leitura[1:-1] # Fatiamento para tirar o primeiro e o ultimo elemento, que no caso são as linhas, logo remove o header e o footer
         publicData = "".join(linha.strip() for linha in leitura)
@@ -66,7 +78,7 @@ class RSA:
         return n, e
     
     def getPrivateKey(self):
-        with open('./Parte 1/keys/privateKey.pem', 'r') as file:
+        with open('./Parte_1/keys/privateKey.pem', 'r') as file:
             leitura = file.readlines()
         leitura = leitura[1:-1] # Fatiamento para tirar o primeiro e o ultimo elemento, que no caso são as linhas, logo remove o header e o footer
         privateData = "".join(linha.strip() for linha in leitura)
@@ -108,14 +120,13 @@ class RSA:
             XOR
             r: string randomica gerada de k0 bits
     """
-    def OAEPEncode(self, message: str):
-        m = message.encode('utf-8')
+    def OAEPEncode(self, message):
         n, _ = self.public
         n = (n.bit_length()+7) // 8  # Tamanho de n em bytes
         k0 = 256 // 8  # Tamanho do hash em bytes
         
-        padding_length = n - k0 - len(m)
-        m_padded = m + b'\x00' * padding_length  
+        padding_length = n - k0 - len(message)
+        m_padded = message + b'\x00' * padding_length  
         
         r = os.urandom(k0)  
         G = hashlib.sha256
@@ -129,19 +140,19 @@ class RSA:
         
         return X + Y
     
-    def RSACriptografa(self, plaintext:str):
-        (n, e) = self.public
+    def RSACriptografa(self, plaintext):
+        (n, d) = self.private
         messageCodificada = self.OAEPEncode(plaintext)
         if messageCodificada == None:
             return "ERRO NO TAMANHO DA MENSAGEM"
         # Pega a mensagem, que está em bytes, segundo o retorno do OAEP, e transforma em int
         mensagemEmInteiros = int.from_bytes(messageCodificada, byteorder='big')
-        ciphertext = pow(mensagemEmInteiros, e, n) # ciphertext = mensagemEmInteiros^e (mod n)
+        ciphertext = pow(mensagemEmInteiros, d, n) # ciphertext = mensagemEmInteiros^e (mod n)
         return ciphertext.to_bytes((ciphertext.bit_length()+7)//8, byteorder='big') 
     def RSADescriptografa(self, ciphertext):
-        (n, d) = self.private
+        (n, e) = self.public
         chipertextEmInteiros = int.from_bytes(ciphertext, byteorder='big')
-        plaintextCodificadoOAEP = pow(chipertextEmInteiros, d, n) # plaintext = ciphertextEmInteiros^d (mod n)
+        plaintextCodificadoOAEP = pow(chipertextEmInteiros, e, n) # plaintext = ciphertextEmInteiros^d (mod n)
         plaintextCodificadoOAEPBytes = plaintextCodificadoOAEP.to_bytes((plaintextCodificadoOAEP.bit_length()+7)//8, byteorder='big')
         return self.OAEPDecode(plaintextCodificadoOAEPBytes)
 
@@ -154,7 +165,6 @@ class RSA:
     def OAEPDecode(self, encoded_message: bytes):
         n, _ = self.public
         n = (n.bit_length()+7) // 8  # Tamanho de n em bytes
-        k0 = 256 // 8  # Tamanho do hash em bytes
         
         
         X = encoded_message[:32]
@@ -168,6 +178,5 @@ class RSA:
         
         m_padded = bytes([a^b for a,b in zip(X, G_r)])
         message = m_padded.rstrip(b'\x00')
-        return message.decode('utf-8')
-rsa = RSA()
-print(rsa.RSADescriptografa(rsa.RSACriptografa("TESTE DE FUNCIONALIDADEAAAA")))
+        return message
+    
