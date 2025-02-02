@@ -41,7 +41,7 @@ def assinar_msg(self, mensagem):
 # Função para verificar a assinatura de uma mensagem
 def verificar_ass(self, assinatura_base64, mensangem):
     # Gera o hash da mensagem recebida utilizando a função gerar_hash
-    hash_msg = self.gerar_hash(mensangem)
+    hash_msg = self.gerar_hash(mensangem) #H(M)
     
     # Decodifica a assinatura de Base64 para bytes
     assinaturaEmBytes = base64.b64decode(assinatura_base64)
