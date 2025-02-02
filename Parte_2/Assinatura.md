@@ -112,6 +112,7 @@ def verificar_ass(self, assinatura_base64, mensagem):
 ```
 
 - Na última etapa da verificação, comparamos o hash da mensagem em claro `hash_msg` com o hash recuperado a partir da assinatura `hash_recuperado`:
+  
   ```python
     # Compara o hash da mensagem recebida com o hash recuperado da assinatura
     if hash_msg == hash_recuperado:
