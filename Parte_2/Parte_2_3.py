@@ -27,7 +27,7 @@ def gerar_hash(self, mensagem):
     # Função para assinar uma mensagem
 def assinar_msg(self, mensagem):
     # Gera o hash da mensagem utilizando a função gerar_hash
-    hash_mensagem = self.gerar_hash(mensagem)
+    hash_mensagem = self.gerar_hash(mensagem) # H(M)
     
     # Criptografa o hash da mensagem utilizando a chave privada do RSA
     assinatura_msg = self.rsa.RSACriptografa(hash_mensagem)  # Retorna a assinatura em formato de bytes
