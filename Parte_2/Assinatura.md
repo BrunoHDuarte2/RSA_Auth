@@ -13,7 +13,7 @@ Para que uma função de hash seja confiável, ela deve possuir as seguintes pro
 
 No algoritmo RSA, a função de hash desempenha um papel fundamental no processo de assinatura digital:
 
-![Diagrama Assinatura RSA]('.../Design sem nome (1).png')
+![Diagrama Assinatura RSA](.../'Design sem nome (1).png')
 
 Conforme ilustrado na imagem acima, é necessária uma função para gerar o hash da mensagem em texto claro antes de assiná-la. Dessa forma, a função de hash será criada para que possa ser utilizada posteriormente na função de assinatura.
 
