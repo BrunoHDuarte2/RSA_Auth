@@ -1,5 +1,5 @@
 # PARTE 2 | Assinatura
-### PARTE II | Funções de Hash
+### PARTE 2 | Funções de Hash
 
 Uma função de hash recebe uma mensagem de tamanho variável como entrada e gera um valor de hash de tamanho fixo, H(M). O principal objetivo dessa função é garantir a integridade dos dados, ou seja, verificar se a mensagem não foi alterada, além de assegurar segurança e autenticidade.
 
