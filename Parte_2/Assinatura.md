@@ -17,9 +17,10 @@ Conforme ilustrado na imagem acima, é necessária uma função para gerar o has
 
 > A biblioteca `hashlib` no Python cria marcas únicas (chamadas de hashes) a partir de dados, como textos ou arquivos. Ela aplica algoritmos matemáticos (como SHA-256 ou MD5) para gerar uma sequência única de caracteres que representa os dados de entrada.
 >
+> 
 > **Observação:** Esta biblioteca assegura as cinco propriedades necessárias para um hash seguro citadas acima.
 
-Nesse projeto, para a assinatura, é utilizada a família SHA-3, que emprega a **construção esponja**. Esse método funciona de maneira semelhante a uma esponja: primeiro, ele "absorve" os dados e, depois, os "extrai". Segue abaixo a implementação do código.
+Nesse projeto, para a assinatura, é utilizada a família SHA-3, que emprega a **construção esponja**. Esse método funciona de maneira semelhante a uma esponja: primeiro, ele "absorve" os dados e, depois, os "extrai". Segue abaixo a implementação do código:
 
 ```python
 # Função para gerar o hash de uma mensagem
@@ -38,6 +39,3 @@ def gerar_hash(self, mensagem):
     gh.update(mensagem)  
     # Retorna o hash gerado em formato binário (bytes)
     return gh.digest()
-    
-   
-
