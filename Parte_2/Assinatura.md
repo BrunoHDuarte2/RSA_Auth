@@ -13,6 +13,8 @@ Para que uma função de hash seja confiável, ela deve possuir as seguintes pro
 
 No algoritmo RSA, a função de hash desempenha um papel fundamental no processo de assinatura digital:
 
+![Diagrama Assinatura RSA]('.../Design sem nome (1).png')
+
 Conforme ilustrado na imagem acima, é necessária uma função para gerar o hash da mensagem em texto claro antes de assiná-la. Dessa forma, a função de hash será criada para que possa ser utilizada posteriormente na função de assinatura.
 
 > A biblioteca `hashlib` no Python cria marcas únicas (chamadas de hashes) a partir de dados, como textos ou arquivos. Ela aplica algoritmos matemáticos (como SHA-256 ou MD5) para gerar uma sequência única de caracteres que representa os dados de entrada.
