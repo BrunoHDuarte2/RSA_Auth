@@ -41,7 +41,7 @@ def gerar_hash(self, mensagem):
     gh.update(mensagem)  
     # Retorna o hash gerado em formato binário (bytes)
     return gh.digest()
-
+```
 
 
 ### PARTE 2 | Assinatura
