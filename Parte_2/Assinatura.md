@@ -50,7 +50,7 @@ A assinatura digital RSA é um método criptográfico que utiliza o algoritmo RS
 
 Como representado na figura a seguir:
 
-![image.png](attachment:b2ba5756-1bf3-4bb0-aa4e-b89853511fc8:image.png)
+![image.png](Diagrama_assinatura.png)
 
 ### Etapas da implementação
 
