@@ -1,5 +1,5 @@
 from Parte_1.RSA import RSA
-from Parte_2.Parte_2_3 import Hash
+from Parte_2_3.Parte_2_3 import Hash
 import base64
 import sys
 rsa = RSA()
